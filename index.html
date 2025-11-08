@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>InSightify | Home</title>
+  <link href="./dist/output.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: Poppins, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    .background-blur {
+      position: fixed; inset: 0;
+      background: url('https://media.istockphoto.com/id/696620392/photo/detail-of-a-confetti-bomb.jpg?s=612x612&w=0&k=20&c=K4JoqVNabEt8KcZhZCF1h_ssGJJ5Lujz8KVUOpMDztw=') center/cover no-repeat;
+      filter: blur(7px) brightness(1.05);
+      transform: scale(1.06);
+      z-index: 0; pointer-events: none;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(79,70,229,.82), rgba(59,130,246,.82)),
+                  url('https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat;
+    }
+    .glass { background: rgba(255,255,255,.82); backdrop-filter: blur(8px); }
+    .card { background: rgba(255,255,255,.9); border: 1px solid rgba(0,0,0,.06); }
+    .logo-arcade { font-family: 'Press Start 2P', system-ui, sans-serif; color: #1e1b4b; letter-spacing: .5px; }
+    /* Event cards */
+    .event-card { cursor: pointer; }
+    .diamond { width: 180px; height: 180px; margin: 0 auto 18px; position: relative; transform: rotate(45deg); overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,.25); border: 3px solid rgba(255,255,255,.95); }
+    .diamond::before { content: ''; position: absolute; inset: -45%; background: var(--bg) center/cover no-repeat; transform: rotate(-45deg); }
+    .event-card.card { background: transparent; border: 0; box-shadow: none; padding: 0; }
+    .event-card .title { margin-top: 14px; }
+    .event-card.small .diamond { width: 180px; height: 180px; }
+    .diamond-row { display:flex; flex-wrap: nowrap; justify-content:center; align-items:flex-start; gap: 24px; overflow: visible; padding-top: 90px; padding-bottom: 16px; }
+    .stagger-up { transform: translateY(-10px); }
+    @media (max-width: 900px){ .diamond { width:150px; height:150px; } .event-card.small .diamond { width:150px; height:150px; } .stagger-up{ transform: translateY(-14px);} }
+    .hero { min-height: 56vh; }
+    .events-section { overflow: visible; }
+    /* Modal */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; z-index: 50; }
+    .modal-backdrop.show { display: flex; }
+    .modal-card { width: min(92vw, 560px); background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+  </style>
+  </head>
+<body class="bg-gradient-to-br from-indigo-50 to-blue-50 text-gray-900">
+  <div class="background-blur"></div>
+  <!-- Header -->
+  <header class="bg-white/80 backdrop-blur border-b relative z-10">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2">
+        <span class="text-3xl md:text-4xl font-bold logo-arcade">InSightify</span>
+      </a>
+      <nav class="flex items-center gap-6 text-sm font-medium">
+        <a href="index.html" class="text-indigo-700">Home</a>
+        <a href="blog.html" class="hover:text-indigo-700">Blog</a>
+        <a href="about.html" class="hover:text-indigo-700">About Us</a>
+        <a href="contact.html" class="hover:text-indigo-700">Contact</a>
+        <a href="login.html" class="hover:text-indigo-700">Login</a>
+        <a href="register.html" class="hover:text-indigo-700">Register</a>
+        <a href="feedback-entry.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">Give Feedback</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero text-white py-28 md:py-32 relative z-10">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="max-w-2xl">
+        <h1 class="text-5xl md:text-6xl font-extrabold leading-tight">Events that inspire. Insights that matter.</h1>
+        <p class="mt-5 text-xl text-indigo-50">Explore our events and see how attendees feel. Your feedback fuels better experiences.</p>
+        <div class="mt-6 flex gap-3">
+          <a href="feedback-entry.html" class="px-5 py-3 rounded-xl bg-white text-indigo-700 font-semibold hover:bg-indigo-100">Share Feedback</a>
+          <a href="blog.html" class="px-5 py-3 rounded-xl border border-white/70 font-semibold hover:bg-white/10">Read Our Blog</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Events overview -->
+  <section class="py-12 events-section">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-2xl font-bold text-indigo-700 mb-4">Our Event Tracks</h2>
+      <p class="text-gray-600 mb-6">We host a variety of experiences. Pick your interest and dive into highlights and insights.</p>
+      <div class="diamond-row mt-2">
+        <div class="event-card stagger-up" data-title="Workshop" data-desc="Hands-on sessions to upskill with experts and peers.">
+          <div class="diamond" style="--bg: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/EWM_shop_2007.jpg/500px-EWM_shop_2007.jpg');"></div>
+        </div>
+        <div class="event-card" data-title="Fest" data-desc="Celebrations with music, food and unforgettable vibes.">
+          <div class="diamond" style="--bg: url('https://s.inyourpocket.com/gallery/katowice/2021/07/klimat-zuzannasosnowska134.jpg');"></div>
+        </div>
+        <div class="event-card stagger-up" data-title="Seminar" data-desc="Talks and panels to explore ideas and future trends.">
+          <div class="diamond" style="--bg: url('https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c2VtaW5hcnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600');"></div>
+        </div>
+        <div class="event-card" data-title="Party" data-desc="Community mixers and team parties that connect people. Music, food and team bonding moments.">
+          <div class="diamond" style="--bg: url('https://media.istockphoto.com/id/1340877381/photo/group-of-people-in-formalwear-communicating-and-smiling.jpg?s=612x612&w=0&k=20&c=Cwx6ARS-LrJRIExAC-UUSOsRadGHQMPhBzAMwMvpf-s=');"></div>
+        </div>
+        <div class="event-card stagger-up" data-title="Other" data-desc="Special formats and custom programs crafted with partners. Tailored to goals and audiences.">
+          <div class="diamond" style="--bg: url('https://capturely.com/wp-content/uploads/events-carousel-15-960x640.webp');"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-12">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="glass rounded-2xl p-6 flex items-center justify-between">
+        <div>
+          <h3 class="text-xl font-bold text-indigo-700">Attended an event?</h3>
+          <p class="text-gray-700">Share your experience and help us improve the next one.</p>
+        </div>
+        <a href="feedback-entry.html" class="px-5 py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700">Give Feedback</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-8 border-t bg-white/80">
+    <div class="max-w-6xl mx-auto px-4 text-sm text-gray-600 flex items-center justify-between">
+      <span>© <span id="yr"></span> InSightify</span>
+      <nav class="flex gap-4">
+        <a href="index.html" class="text-indigo-700">Home</a>
+        <a href="blog.html" class="hover:text-indigo-700">Blog</a>
+        <a href="about.html" class="hover:text-indigo-700">About</a>
+        <a href="contact.html" class="hover:text-indigo-700">Contact</a>
+      </nav>
+    </div>
+  </footer>
+  <!-- Modal -->
+  <div id="eventModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="eventModalTitle">
+    <div class="modal-card">
+      <div class="flex items-start justify-between mb-2">
+        <h3 id="eventModalTitle" class="text-lg font-semibold text-indigo-700">Event</h3>
+        <button id="modalClose" class="px-2 py-1 rounded hover:bg-gray-100">✕</button>
+      </div>
+      <p id="eventModalBody" class="text-gray-700"></p>
+      <div class="mt-4 text-right">
+        <a href="feedback-entry.html" class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">Give Feedback</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    const modal = document.getElementById('eventModal');
+    const modalTitle = document.getElementById('eventModalTitle');
+    const modalBody = document.getElementById('eventModalBody');
+    function openModal(title, desc){ modalTitle.textContent = title; modalBody.textContent = desc; modal.classList.add('show'); }
+    function closeModal(){ modal.classList.remove('show'); }
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    modal.addEventListener('click', (e)=>{ if (e.target === modal) closeModal(); });
+    document.querySelectorAll('.event-card').forEach(card=>{
+      card.addEventListener('click', ()=> openModal(card.dataset.title || 'Event', card.dataset.desc || ''));
+    });
+    // Fallback if an external image is blocked
+    document.querySelectorAll('.diamond img').forEach(img=>{
+      img.addEventListener('error', ()=>{
+        if (img.dataset.fallback && img.src !== img.dataset.fallback) img.src = img.dataset.fallback;
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>InSightify | Blog</title>
+  <link href="./dist/output.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: Poppins, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    .hero { background: linear-gradient(135deg, rgba(79,70,229,.85), rgba(59,130,246,.7)); }
+    .card { background: rgba(255,255,255,.9); border: 1px solid rgba(0,0,0,.06); }
+    .background-blur { position: fixed; inset: 0; background: url('https://markletic.com/wp-content/uploads/2020/09/6-Brilliant-Platforms-to-Host-Your-Virtual-Events-Featured-Image-762x429.jpg') center/cover no-repeat; filter: blur(7px) brightness(1.05); transform: scale(1.06); z-index: 0; pointer-events: none; }
+    .logo-arcade { font-family: 'Press Start 2P', system-ui, sans-serif; color: #1e1b4b; letter-spacing: .5px; }
+    .small-img { width: 85%; display:block; margin: 0 auto 12px; border-radius: 12px; transition: transform .25s ease, box-shadow .25s ease; }
+    .card:hover .small-img { transform: translateY(-6px); box-shadow: 0 10px 24px rgba(0,0,0,.15); }
+    /* Modal */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; z-index: 50; }
+    .modal-backdrop.show { display: flex; }
+    .modal-card { width: min(92vw, 560px); background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 to-blue-50 text-gray-900">
+  <div class="background-blur"></div>
+  <header class="bg-white/90 backdrop-blur border-b">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2">
+        <span class="text-3xl md:text-4xl font-bold logo-arcade">InSightify</span>
+      </a>
+      <nav class="flex items-center gap-6 text-sm font-medium">
+        <a href="index.html" class="hover:text-indigo-700">Home</a>
+        <a href="blog.html" class="text-indigo-700">Blog</a>
+        <a href="about.html" class="hover:text-indigo-700">About Us</a>
+        <a href="contact.html" class="hover:text-indigo-700">Contact</a>
+        <a href="feedback-entry.html" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">Give Feedback</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero text-white py-14">
+    <div class="max-w-6xl mx-auto px-4">
+      <h1 class="text-3xl font-extrabold">Event Stories & Insights</h1>
+      <p class="text-indigo-100 mt-2 max-w-2xl">Updates and learnings from our Workshops, Fests, Seminars, Parties and more.</p>
+    </div>
+  </section>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Workshop -->
+    <article class="card rounded-2xl p-5 blog-card" data-title="Workshops & hands-on" data-desc="Best practices, guides and tools from our workshop sessions." data-long="Deep-dive, hands-on sessions led by practitioners. Expect guided exercises, code-alongs, and templates you can take back to your team. We publish step-by-step recaps, downloadable assets, and answers to top attendee questions to help you implement quickly.">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/EWM_shop_2007.jpg/500px-EWM_shop_2007.jpg" alt="Workshop" class="rounded-xl mb-3 small-img">
+      <h2 class="font-semibold text-lg">Workshops & hands-on</h2>
+      <p class="text-sm text-gray-600 mt-1">Best practices, guides and tools from our workshop sessions.</p>
+    </article>
+    <!-- Fest -->
+    <article class="card rounded-2xl p-5 blog-card" data-title="Festivals & culture" data-desc="Recaps, photos and behind-the-scenes from our celebrations." data-long="A look at the energy and culture behind our festivals—from planning to the big day. Browse photo stories, highlight reels, and notes on partners, production, and what made the experience memorable for attendees.">
+      <img src="https://s.inyourpocket.com/gallery/katowice/2021/07/klimat-zuzannasosnowska134.jpg" alt="Fest" class="rounded-xl mb-3 small-img">
+      <h2 class="font-semibold text-lg">Fest highlights and moments</h2>
+      <p class="text-sm text-gray-600 mt-1">Recaps, photos and behind-the-scenes from our celebrations.</p>
+    </article>
+    <!-- Seminar -->
+    <article class="card rounded-2xl p-5 blog-card" data-title="Seminars & thought leadership" data-desc="Keynotes, decks and summaries from speakers and panels." data-long="Curated insights from experts: keynote takeaways, annotated slide decks, and bite-size summaries of each talk. We also include reading lists and links to tools so you can continue exploring the topic.">
+      <img src="https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c2VtaW5hcnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600" alt="Seminar" class="rounded-xl mb-3 small-img">
+      <h2 class="font-semibold text-lg">Seminars & thought leadership</h2>
+      <p class="text-sm text-gray-600 mt-1">Keynotes, decks and summaries from speakers and panels.</p>
+    </article>
+    <!-- Party -->
+    <article class="card rounded-2xl p-5 blog-card" data-title="Parties & community mixers" data-desc="Connections made, teams strengthened and energy captured." data-long="Snapshots of community-building moments: team-bonding activities, icebreakers that actually work, and attendee feedback on what helped them connect. Use these playbooks to host your own high‑vibe mixer.">
+      <img src="https://media.istockphoto.com/id/1340877381/photo/group-of-people-in-formalwear-communicating-and-smiling.jpg?s=612x612&w=0&k=20&c=Cwx6ARS-LrJRIExAC-UUSOsRadGHQMPhBzAMwMvpf-s=" alt="Party" class="rounded-xl mb-3 small-img">
+      <h2 class="font-semibold text-lg">Parties & community mixers</h2>
+      <p class="text-sm text-gray-600 mt-1">Connections made, teams strengthened and energy captured.</p>
+    </article>
+    <!-- Other -->
+    <article class="card rounded-2xl p-5 blog-card" data-title="Special formats" data-desc="Unique experiences designed for specific goals and audiences." data-long="Experimental formats—from micro‑workshops to pop‑up labs—tailored to specific outcomes. We document objectives, run-of-show, resources, and lessons learned so you can replicate or remix them with confidence.">
+      <img src="https://capturely.com/wp-content/uploads/events-carousel-15-960x640.webp" alt="Other" class="rounded-xl mb-3 small-img">
+      <h2 class="font-semibold text-lg">Special formats</h2>
+      <p class="text-sm text-gray-600 mt-1">Unique experiences designed for specific goals and audiences.</p>
+    </article>
+  </main>
+
+  <footer class="py-8 border-t bg-white/80">
+    <div class="max-w-6xl mx-auto px-4 text-sm text-gray-600 flex items-center justify-between">
+      <span>© <span id="yr"></span> InSightify</span>
+      <nav class="flex gap-4">
+        <a href="index.html" class="hover:text-indigo-700">Home</a>
+        <a href="blog.html" class="text-indigo-700">Blog</a>
+        <a href="about.html" class="hover:text-indigo-700">About</a>
+        <a href="contact.html" class="hover:text-indigo-700">Contact</a>
+      </nav>
+    </div>
+  </footer>
+  
+  <!-- Modal -->
+  <div id="blogModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="flex items-start justify-between">
+        <h3 id="blogModalTitle" class="text-xl font-bold text-indigo-700">Event</h3>
+        <button id="blogModalClose" class="text-gray-500 hover:text-gray-800">✕</button>
+      </div>
+      <p id="blogModalBody" class="mt-3 text-gray-700"></p>
+    </div>
+  </div>
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    const bModal = document.getElementById('blogModal');
+    const bTitle = document.getElementById('blogModalTitle');
+    const bBody = document.getElementById('blogModalBody');
+    document.getElementById('blogModalClose').addEventListener('click', ()=> bModal.classList.remove('show'));
+    bModal.addEventListener('click', (e)=>{ if (e.target === bModal) bModal.classList.remove('show'); });
+    document.querySelectorAll('.blog-card').forEach(card=>{
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', ()=>{
+        bTitle.textContent = card.dataset.title || card.querySelector('h2')?.textContent || 'Event';
+        bBody.textContent = card.dataset.long || card.dataset.desc || card.querySelector('p')?.textContent || '';
+        bModal.classList.add('show');
+      });
+    });
+  </script>
+</body>
+</html>

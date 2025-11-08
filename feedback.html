@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Feedback | Smart Feedback</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' x='6' font-size='48'%3E%F0%9F%93%A3%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="./style.css?v=20251101" />
+  <link href="./dist/output.css?v=20251101" rel="stylesheet">
+  <style>
+    /* User-provided improvements (moved into proper style block) */
+    label, p, h1, h2, h3, select, textarea, option { color: #111827 !important; }
+    .gender-btn { transition: all 0.25s ease; }
+    .gender-btn.active { background-color: #4f46e5; color: #fff !important; border-color: #4338ca; }
+    .error-highlight { border: 2px solid #ef4444 !important; box-shadow: 0 0 6px rgba(239,68,68,.5); }
+    /* Darker outlines for scale pills */
+    .scale-pill { border-color: #111827 !important; color: #111827 !important; }
+    [role="radiogroup"] label { user-select: none; pointer-events: auto; }
+    /* Make radio and its text sit side-by-side in aligned columns */
+    #q_bestpart label, #q_recommend label { display:grid; grid-template-columns: 22px 1fr; align-items:center; gap:12px; font-weight:500; color:#111827 !important; }
+    #q_bestpart input[type="radio"], #q_recommend input[type="radio"] { margin:0; width:18px; height:18px; }
+    /* Emoji radio visuals with input + span sibling */
+    .emoji-wrap { position: relative; display:inline-flex; }
+    .emoji-input { position:absolute; opacity:0; pointer-events:none; width:0; height:0; }
+    .emoji-pill { display:flex; align-items:center; justify-content:center; width:36px; height:36px; border:1.5px solid #111827; border-radius:9999px; font-size:20px; transition:box-shadow .15s, background .15s; }
+    .emoji-input:checked + .emoji-pill { box-shadow:0 0 0 3px rgba(79,70,229,.5); background:#eef2ff; border-color:#4f46e5; }
+    /* Background blur layer */
+    .background-blur {
+      position: fixed;
+      inset: 0;
+      background: url('https://www.start-pulse.com/media/pages/ressourcen/wissen/mitarbeiterbefragungen-en/dbaaf133a4-1746605695/pulse-email.svg')
+        no-repeat center 70%; /* nudge image a bit downward */
+      background-size: cover; /* no manual zoom */
+      filter: blur(5px) brightness(1);
+      opacity: 0.78;
+      transform: scale(1.04);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Gradient mask to hide lower portion (person) without zooming */
+    .background-mask {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 48%, rgba(238,242,255,0.96) 74%, rgba(238,242,255,1) 100%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Center content perfectly */
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(to bottom right, #eef2ff, #dbeafe);
+      padding: 1.5rem;
+      position: relative;
+      overflow: auto;
+    }
+
+    /* Responsive content layout: card + side image */
+    .content-wrap {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap; /* stack on narrow screens */
+      position: relative; /* for planes overlay */
+    }
+    .side-illustration {
+      width: 420px; /* bigger image */
+      max-width: 50vw;
+      aspect-ratio: 1/1;
+      background: url('https://www.start-pulse.com/media/pages/ressourcen/wissen/mitarbeiterbefragungen-en/dbaaf133a4-1746605695/pulse-email.svg') center/contain no-repeat;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
+      opacity: 0; /* staged: start hidden */
+      transform: translateY(16px);
+      animation: girlIn 0.9s ease-out forwards, floatY 5s ease-in-out infinite 1.2s;
+      position: relative; /* anchor planes to image */
+      z-index: 1; /* keep above planes */
+    }
+    .side-illustration.replaced {
+      background: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+      animation: none !important;
+    }
+    .feedback-card {
+      position: relative;
+      z-index: 1; /* keep above planes */
+      opacity: 0;
+      transform: scale(0.92);
+      animation: popIn 0.5s ease-out forwards;
+      animation-delay: 0.7s; /* after girl */
+      width: 100%;
+      max-width: 700px;
+    }
+    /* Semi-transparent white inputs and selects */
+    #feedbackForm input[name="event"],
+    #feedbackForm textarea[name="message"],
+    #feedbackForm select {
+      background: rgba(255,255,255,0.55);
+      border: 1px solid rgba(255,255,255,0.6);
+      color: #111827;
+      backdrop-filter: blur(4px);
+    }
+    #feedbackForm input::placeholder,
+    #feedbackForm textarea::placeholder {
+      color: rgba(55,65,81,0.6);
+    }
+    /* Transparent-only textarea (the minimal one without name) */
+    #feedbackForm textarea {
+      background: transparent !important;
+      border: 1px solid rgba(255,255,255,0.5);
+      color: #111827;
+      backdrop-filter: none;
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      min-height: 6rem;
+    }
+    #feedbackForm textarea::placeholder {
+      color: rgba(55,65,81,0.6);
+    }
+
+    @keyframes girlIn {
+      0% { opacity: 0; transform: translateY(16px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes floatY {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.92); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    /* planes removed */
+
+    @media (max-width: 768px) {
+      .content-wrap {
+        flex-direction: column;
+      }
+      .side-illustration { display:none; }
+      .feedback-card { max-width: 100%; padding: 1rem; }
+      #q_bestpart label, #q_recommend label { grid-template-columns: 20px 1fr; font-size: clamp(0.95rem, 3.5vw, 1.05rem); }
+      button[id^="nextStep"], button[id^="backStep"] { width: 100%; }
+      .mt-4.flex.justify-between { gap: 12px; }
+    }
+    /* Emoji image rating (image-based) */
+    .emoji-rating { display:flex; justify-content:center; gap:25px; margin-top:12px; }
+    .emoji { width:60px; height:60px; cursor:pointer; opacity:.5; transition:all .3s ease; filter:grayscale(100%); }
+    .emoji:hover { transform:scale(1.15); opacity:.8; }
+    .emoji.selected { transform:scale(1.2); opacity:1; filter:none; }
+    .emoji[data-value="1"].selected { filter:grayscale(0%) sepia(1) hue-rotate(-50deg) saturate(800%) brightness(60%); }
+    .emoji[data-value="2"].selected { filter:grayscale(0%) sepia(1) hue-rotate(-20deg) saturate(600%) brightness(85%); }
+    .emoji[data-value="3"].selected { filter:grayscale(0%) sepia(1) hue-rotate(40deg) saturate(600%) brightness(100%); }
+    .emoji[data-value="4"].selected { filter:grayscale(0%) sepia(1) hue-rotate(70deg) saturate(700%) brightness(95%); }
+    .emoji[data-value="5"].selected { filter:grayscale(0%) sepia(1) hue-rotate(90deg) saturate(900%) brightness(80%); }
+    @media (max-width: 600px) { .emoji { width:45px; height:45px; } }
+    /* Food numeric scale styles */
+    #q_food_quality label { display:inline-flex; align-items:center; justify-content:center; width:46px; height:46px; margin-right:18px; border:1.5px solid #111827; border-radius:8px; cursor:pointer; user-select:none; transition: background .15s ease, border-color .15s ease, color .15s ease; }
+    #q_food_quality label.selected { background:#4f46e5 !important; color:#fff !important; border-color:#4338ca !important; border-width:2px; }
+  </style>
+</head>
+<body>
+  <div class="background-blur"></div>
+  <div class="background-mask"></div>
+
+  <div style="position:relative; z-index:1;">
+    <div class="content-wrap">
+      <div class="max-w-xl mx-auto p-2 sm:p-4 md:p-6 feedback-card">
+      <h1 class="text-2xl font-bold text-indigo-700 mb-4 text-center">
+        Share Your Feedback
+      </h1>
+
+      <div id="authStatus" class="text-sm text-gray-600 mb-4 text-center"></div>
+
+      <form id="feedbackForm" class="space-y-4">
+        <div class="form-step" data-step="1">
+        <label class="block text-sm text-gray-900 mb-1 bg-transparent">Event</label>
+        <select id="event_type" name="event_type" class="w-full p-3 border rounded-lg">
+          <option value="">Select event...</option>
+          <option value="Workshop">Workshop</option>
+          <option value="Fest">Fest</option>
+          <option value="Seminar">Seminar</option>
+          <option value="Party">Party</option>
+          <option value="Other">Other</option>
+        </select>
+        <input 
+          type="text" 
+          id="event_other"
+          name="event_other" 
+          placeholder="Enter event name"
+          class="w-full p-3 border rounded-lg mt-2 hidden" 
+        />
+
+        <!-- Aspect Ratings -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-sm text-gray-900 mb-1 bg-transparent">Overall Experience</label>
+            <select name="rating_overall" id="rating_overall" class="w-full p-3 border rounded-lg">
+              <option value="">Select</option>
+              <option value="outstanding">Outstanding / Very Very Good</option>
+              <option value="excellent">Excellent</option>
+              <option value="very_good">Very Good</option>
+              <option value="good">Good</option>
+              <option value="ok">Ok / Fine / It’s ok</option>
+              <option value="bad">Bad</option>
+              <option value="very_bad">Very Bad</option>
+              <option value="worst">Worst</option>
+              <option value="more_worst">More Worst</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-900 mb-1 bg-transparent">Organization</label>
+            <select name="rating_org" id="rating_org" class="w-full p-3 border rounded-lg">
+              <option value="">Select</option>
+              <option value="outstanding">Outstanding / Very Very Good</option>
+              <option value="excellent">Excellent</option>
+              <option value="very_good">Very Good</option>
+              <option value="good">Good</option>
+              <option value="ok">Ok / Fine / It’s ok</option>
+              <option value="bad">Bad</option>
+              <option value="very_bad">Very Bad</option>
+              <option value="worst">Worst</option>
+              <option value="more_worst">More Worst</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-900 mb-1 bg-transparent">Speakers/Content</label>
+            <select name="rating_speakers" id="rating_speakers" class="w-full p-3 border rounded-lg">
+              <option value="">Select</option>
+              <option value="outstanding">Outstanding / Very Very Good</option>
+              <option value="excellent">Excellent</option>
+              <option value="very_good">Very Good</option>
+              <option value="good">Good</option>
+              <option value="ok">Ok / Fine / It’s ok</option>
+              <option value="bad">Bad</option>
+              <option value="very_bad">Very Bad</option>
+              <option value="worst">Worst</option>
+              <option value="more_worst">More Worst</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-4 flex justify-end">
+          <button type="button" id="nextStep1" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Next</button>
+        </div>
+        </div>
+
+        
+
+        <!-- Step 2: Emoji 5-point scales (image-based) -->
+        <div class="form-step hidden mt-6 p-4 rounded-xl bg-white/60 border" data-step="2">
+          <div class="space-y-6">
+            <div>
+              <p class="text-sm font-medium mb-2">How entertaining was the event? <span class="text-red-600">*</span></p>
+              <div class="emoji-rating" id="entertainment-rating" data-target="entertaining">
+                <img src="https://i.imgur.com/yb3nX3v.png" class="emoji" data-value="1" alt="Very Bad">
+                <img src="https://i.imgur.com/yb3nX3v.png" class="emoji" data-value="2" alt="Bad">
+                <img src="https://i.imgur.com/yb3nX3v.png" class="emoji" data-value="3" alt="Neutral">
+                <img src="https://i.imgur.com/yb3nX3v.png" class="emoji" data-value="4" alt="Good">
+                <img src="https://i.imgur.com/yb3nX3v.png" class="emoji" data-value="5" alt="Very Good">
+              </div>
+              <input type="hidden" id="rating_entertaining" name="entertaining" />
+              <div class="flex justify-between text-xs text-gray-700 mt-1"><span>Boring</span><span>Fantastic</span></div>
+            </div>
+            <div>
+              <p class="text-sm font-medium mb-2">How inspired did you feel after the event? <span class="text-red-600">*</span></p>
+              <div class="emoji-rating" id="inspiration-rating" data-target="inspired">
+                <img src="https://i.imgur.com/yb3nX3v.png" class="emoji" data-value="1" alt="Very Bad">
+                <img src="https://i.imgur.com/yb3nX3v.png" class="emoji" data-value="2" alt="Bad">
+                <img src="https://i.imgur.com/yb3nX3v.png" class="emoji" data-value="3" alt="Neutral">
+                <img src="https://i.imgur.com/yb3nX3v.png" class="emoji" data-value="4" alt="Good">
+                <img src="https://i.imgur.com/yb3nX3v.png" class="emoji" data-value="5" alt="Very Good">
+              </div>
+              <input type="hidden" id="rating_inspired" name="inspired" />
+              <div class="flex justify-between text-xs text-gray-700 mt-1"><span>None</span><span>Fired up!</span></div>
+            </div>
+            <div>
+              <p class="text-sm font-medium mb-2">Did the event provide value for money? <span class="text-red-600">*</span></p>
+              <div class="emoji-rating" id="value-rating" data-target="value_money">
+                <img src="https://i.imgur.com/yb3nX3v.png" class="emoji" data-value="1" alt="Very Bad">
+                <img src="https://i.imgur.com/yb3nX3v.png" class="emoji" data-value="2" alt="Bad">
+                <img src="https://i.imgur.com/yb3nX3v.png" class="emoji" data-value="3" alt="Neutral">
+                <img src="https://i.imgur.com/yb3nX3v.png" class="emoji" data-value="4" alt="Good">
+                <img src="https://i.imgur.com/yb3nX3v.png" class="emoji" data-value="5" alt="Very Good">
+              </div>
+              <input type="hidden" id="rating_value" name="value_money" />
+              <div class="flex justify-between text-xs text-gray-700 mt-1"><span>Not at all</span><span>Definitely</span></div>
+            </div>
+          </div>
+          <div class="mt-4 flex justify-between">
+            <button type="button" id="backStep2" class="px-4 py-2 border rounded-lg text-gray-900">Back</button>
+            <button type="button" id="nextStep2" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Next</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Best Part + Recommend -->
+        <div class="form-step hidden mt-6 p-4 rounded-xl bg-white/60 border" data-step="3">
+          <div class="mt-1">
+            <p class="text-sm font-medium mb-1">What was the single best part of the event?</p>
+            <div id="q_bestpart" class="space-y-1">
+              <label class="block"><input type="radio" name="best_part" value="Speakers / Presentations" class="mr-2">Speakers / Presentations</label>
+              <label class="block"><input type="radio" name="best_part" value="Hands-on activities / Demos" class="mr-2">Hands-on activities / Demos</label>
+              <label class="block"><input type="radio" name="best_part" value="Networking opportunities" class="mr-2">Networking opportunities</label>
+              <label class="block"><input type="radio" name="best_part" value="Venue / Logistics" class="mr-2">Venue / Logistics</label>
+              <label class="block"><input type="radio" name="best_part" value="Giveaways / Refreshments" class="mr-2">Giveaways / Refreshments</label>
+              <label class="block"><input type="radio" name="best_part" value="Other" class="mr-2">Other</label>
+            </div>
+          </div>
+          <div class="mt-4">
+            <p class="text-sm font-medium mb-1">Would you recommend a similar event to a friend? <span class="text-red-600">*</span></p>
+            <div id="q_recommend" class="space-y-1">
+              <label class="block"><input type="radio" name="recommend" value="Yes, definitely" class="mr-2">Yes, definitely</label>
+              <label class="block"><input type="radio" name="recommend" value="Maybe, if the content was changed" class="mr-2">Maybe, if the content was changed</label>
+              <label class="block"><input type="radio" name="recommend" value="Maybe, if it was cheaper" class="mr-2">Maybe, if it was cheaper</label>
+              <label class="block"><input type="radio" name="recommend" value="No, never" class="mr-2">No, never</label>
+            </div>
+          </div>
+          <div class="mt-4">
+            <label class="block text-sm font-medium mb-1">Additional comments (optional)</label>
+            <textarea id="feedbackText" name="message" placeholder="Write your feedback here..."></textarea>
+            <p id="feedbackError" class="text-red-600 text-sm mt-1 hidden">Feedback must be at least 10 characters.</p>
+          </div>
+          <div class="mt-4 flex justify-between">
+            <button type="button" id="backStep3" class="px-4 py-2 border rounded-lg text-gray-900">Back</button>
+            <button type="button" id="nextStep3" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Next</button>
+          </div>
+        </div>
+
+        <!-- Step 4: The Presenters -->
+        <div class="form-step hidden mt-6 p-4 rounded-xl bg-white/60 border" data-step="4">
+          <h3 class="text-lg font-semibold text-indigo-700 mb-3">The Presenters</h3>
+          <p class="text-sm text-gray-800 mb-3">Evaluate presenters on how they met the criteria below (optional).</p>
+          <div id="presentersMatrix1" class="space-y-6"></div>
+          <div class="mt-4 flex justify-between">
+            <button type="button" id="backStep4" class="px-4 py-2 border rounded-lg text-gray-900">Back</button>
+            <button type="button" id="nextStep4" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Next</button>
+          </div>
+        </div>
+
+        <!-- Step 5: Venue (Part 1) -->
+        <div class="form-step hidden mt-6 p-4 rounded-xl bg-white/60 border" data-step="5">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">The Venue</h3>
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm font-medium mb-1">Overall, were you satisfied with the venue and were you able to see and hear the presentations clearly?</p>
+              <div id="q_venue_clear" class="space-y-1">
+                <label class="block"><input type="radio" name="venue_clear" value="Yes" class="mr-2">Yes</label>
+                <label class="block"><input type="radio" name="venue_clear" value="No" class="mr-2">No</label>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">What problems did you encounter? (optional)</label>
+              <textarea id="venue_problems" name="venue_problems" placeholder="Write here..."></textarea>
+            </div>
+            <div>
+              <p class="text-sm font-medium mb-1">How was the quality of the food?</p>
+              <div id="q_food_quality" class="flex flex-wrap items-center gap-2"></div>
+              <input type="hidden" id="food_quality" name="food_quality" />
+              <div class="flex justify-between text-xs text-gray-700 mt-1">
+                <span>Terrible</span>
+                <span>Great</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex justify-between">
+            <button type="button" id="backStep5" class="px-4 py-2 border rounded-lg text-gray-900">Back</button>
+            <button type="button" id="nextStep5" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Next</button>
+          </div>
+        </div>
+
+        <!-- Step 6: Venue (Part 2) -->
+        <div class="form-step hidden mt-6 p-4 rounded-xl bg-white/60 border" data-step="6">
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm font-medium mb-1">Was there a large enough selection of food?</p>
+              <div id="q_food_selection" class="space-y-1">
+                <label class="block"><input type="radio" name="food_selection" value="Heaps of choice" class="mr-2">Heaps of choice</label>
+                <label class="block"><input type="radio" name="food_selection" value="An adequate range" class="mr-2">An adequate range</label>
+                <label class="block"><input type="radio" name="food_selection" value="Some choice, but not what I wanted" class="mr-2">Some choice, but not what I wanted</label>
+                <label class="block"><input type="radio" name="food_selection" value="Not enough" class="mr-2">Not enough</label>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">In your opinion, what is the most important feature we should look for when choosing a venue? (optional)</label>
+              <textarea id="venue_feature" name="venue_feature" placeholder="Write here..."></textarea>
+            </div>
+          </div>
+          <div class="mt-4 flex justify-between">
+            <button type="button" id="backStep6" class="px-4 py-2 border rounded-lg text-gray-900">Back</button>
+            <button type="button" id="nextStep6" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Next</button>
+          </div>
+        </div>
+
+        <!-- Step 7: Personal Details (Optional) -->
+        <div class="form-step hidden mt-6 p-4 rounded-xl bg-white/60 border" data-step="7">
+          <h3 class="text-lg font-semibold text-indigo-700 mb-1">Personal Details</h3>
+          <p class="text-sm text-gray-800 mb-3">A few final questions about you. Optional.</p>
+
+          <div class="mb-3">
+            <p class="text-sm font-medium mb-2 text-gray-900">What is your gender?</p>
+            <div class="flex gap-3">
+              <button type="button" id="gender_female" class="gender-btn flex-1 border border-gray-300 rounded-lg p-3 hover:bg-indigo-50 text-gray-800 bg-white/60">♀ Female</button>
+              <button type="button" id="gender_male" class="gender-btn flex-1 border border-gray-300 rounded-lg p-3 hover:bg-indigo-50 text-gray-800 bg-white/60">♂ Male</button>
+              <button type="button" id="gender_other" class="gender-btn flex-1 border border-gray-300 rounded-lg p-3 hover:bg-indigo-50 text-gray-800 bg-white/60">Other</button>
+            </div>
+            <input type="hidden" id="gender" name="gender" value="" />
+            <input type="text" id="gender_other_text" name="gender_other_text" placeholder="Please specify" class="w-full p-3 border rounded-lg mt-2 hidden" />
+          </div>
+
+          <div>
+            <label for="age_group" class="block text-sm font-medium mb-2 bg-transparent text-gray-900">Please select your age group.</label>
+            <select id="age_group" name="age_group" class="w-full p-3 border rounded-lg">
+              <option value="">Please choose...</option>
+              <option value="under_18">Under 18</option>
+              <option value="18_24">18–24</option>
+              <option value="25_34">25–34</option>
+              <option value="35_44">35–44</option>
+              <option value="45_54">45–54</option>
+              <option value="55_64">55–64</option>
+              <option value="65_plus">65+</option>
+            </select>
+          </div>
+          <div class="mt-4 flex justify-between">
+            <button type="button" id="backStep7" class="px-4 py-2 border rounded-lg text-gray-900">Back</button>
+            <button 
+              id="submitBtn"
+              type="submit" 
+              class="px-4 py-2 bg-indigo-600 text-white rounded-lg">
+              Submit Feedback
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div id="result" class="mt-4 text-center text-indigo-700"></div>
+      </div>
+      <div class="side-illustration">
+        <div id="sidePanel" class="w-full h-full flex flex-col items-center justify-center text-center p-4 hidden">
+          <div id="thankYouPanel" class="mb-2">
+            <h2 class="text-2xl font-bold text-indigo-800">Thank you for submitting your feedback!</h2>
+            <p class="text-gray-900 mt-1">Here is how we read your sentiment:</p>
+          </div>
+          <div id="sentimentBadge" class="mb-2 hidden"></div>
+          <div id="sentimentQuote" class="mt-2 text-gray-900 hidden"></div>
+          <div id="sentimentImage" class="mt-4 flex justify-center hidden">
+            <img id="sentimentImgEl" src="" alt="sentiment" class="w-48 h-48 object-contain" />
+          </div>
+        </div>
+      </div>
+      <div class="planes" aria-hidden="true">
+        <span class="plane p1"></span>
+        <span class="plane p2"></span>
+        <span class="plane p3"></span>
+        <span class="plane p4"></span>
+        <span class="plane p5"></span>
+        <span class="plane p6"></span>
+        <span class="plane p7"></span>
+        <span class="plane p8"></span>
+        <span class="plane p9"></span>
+        <span class="plane p10"></span>
+      </div>
+    </div>
+
+    <div class="text-center mt-6">
+      <a id="summaryLink" href="summary.html?role=admin" class="text-indigo-600 hover:underline" style="display:none">View Summary</a>
+    </div>
+  </div>
+  <script src="./js/feedback.js?v=20251101-3"></script>
+  <script>
+    // Show Summary link only for admins (keep)
+    (function(){
+      try {
+        const u = JSON.parse(localStorage.getItem('user') || 'null');
+        const isAdmin = u && u.role === 'admin';
+        const link = document.getElementById('summaryLink');
+        if (isAdmin && link) link.style.display = 'inline';
+      } catch(_) {}
+    })();
+  </script>
+</body>
+</html>

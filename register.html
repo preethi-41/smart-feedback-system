@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Event Registration | InSightify</title>
+  <link href="./dist/output.css" rel="stylesheet">
+  <style>
+    /* Background image styling (same as login) */
+    body { font-family: Poppins, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+
+    .background-blur { position: fixed; inset: 0; background: url('https://cdn.encoreglobal.com/wp-content/uploads/sites/3/2024/08/06192808/Planning-Early-string-lights-1536x1026.jpg') center/cover no-repeat; filter: blur(7px) brightness(1.05); transform: scale(1.06); z-index: 0; pointer-events: none; }
+
+    .glass { background: rgba(255,255,255,.92); backdrop-filter: blur(10px); }
+    .logo-arcade { font-family: 'Press Start 2P', system-ui, sans-serif; color: #1e1b4b; letter-spacing: .5px; }
+    .step { display: none; }
+    .step.active { display: block; }
+    .help { font-size: 12px; color: #6b7280; }
+    .err { font-size: 12px; color: #dc2626; display:none; margin-top: 6px; }
+    .invalid { border-color: #ef4444 !important; box-shadow: 0 0 0 1px rgba(239,68,68,.25) inset; }
+    /* Modal */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; z-index: 50; }
+    .modal-backdrop.show { display: flex; }
+    .modal-card { width: min(92vw, 560px); background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+
+    /* Transparent box with animation (mirror of login) */
+    .register-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+      padding: 40px;
+      width: 750px;
+      max-width: 95%;
+      opacity: 0;
+      transform: translateX(100px); /* slide from right to mirror login */
+      animation: slideIn 1.2s ease-out forwards;
+    }
+
+    .register-image { /* LEFT image */
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 1.5s ease-out 0.8s forwards;
+      margin-right: 20px;
+    }
+    .register-image img {
+      width: 100%;
+      max-width: 320px;
+      object-fit: contain;
+      animation: float 5s ease-in-out infinite 2s;
+    }
+
+    .register-form { /* RIGHT form */
+      flex: 1;
+      text-align: center;
+      padding-left: 20px;
+    }
+
+    @keyframes slideIn {
+      0% { opacity: 0; transform: translateX(120px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .error {
+      color: #dc2626;
+      font-size: 0.875rem;
+      margin-top: 4px;
+      display: none;
+      text-align: left;
+    }
+
+    @media (max-width: 768px) {
+      .register-box {
+        flex-direction: column-reverse; /* image above form on mobile */
+        padding: 25px;
+      }
+      .register-image {
+        margin: 0 0 16px 0;
+      }
+    }
+    @media (max-width: 480px) {
+      .register-box {
+        padding: 20px;
+      }
+      .register-image {
+        margin: 0 0 10px 0;
+      }
+      .register-image img {
+        max-width: 250px;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-indigo-50/30">
+  <div class="background-blur"></div>
+  <!-- Header with logo -->
+  <header class="bg-white/80 backdrop-blur border-b relative z-10">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2">
+        <span class="text-2xl md:text-3xl font-bold logo-arcade">InSightify</span>
+      </a>
+      <nav class="flex items-center gap-6 text-sm font-medium">
+        <a href="index.html" class="hover:text-indigo-700">Home</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Event Registration Form -->
+  <main class="relative z-10 max-w-5xl mx-auto px-4 py-10">
+    <div class="glass rounded-2xl shadow-xl p-8">
+      <h1 class="text-3xl md:text-4xl font-extrabold text-indigo-900 text-center">Event Registration Form</h1>
+      <p class="text-center text-gray-600 mt-1">Last Registration Day - <span id="lastDay"></span></p>
+      <div class="h-px bg-gray-200 my-6"></div>
+
+      <!-- Single Step: Attendee Info -->
+      <section id="step1" class="step active">
+        <h2 class="text-xl font-semibold text-center mb-1">Attendee Information</h2>
+        <p class="text-center help mb-6">Please fill name and contact information of attendees.</p>
+
+        <form id="formStep1" class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium mb-1">Your Name</label>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <select id="prefix" class="border rounded-lg p-3">
+                <option>Mr.</option>
+                <option>Ms.</option>
+                <option>Mrs.</option>
+                <option>Dr.</option>
+              </select>
+              <div>
+                <input id="firstName" type="text" placeholder="First Name" class="w-full border rounded-lg p-3" required>
+                <p id="err_firstName" class="err">Please enter your first name.</p>
+              </div>
+              <div>
+                <input id="lastName" type="text" placeholder="Last Name" class="w-full border rounded-lg p-3" required>
+                <p id="err_lastName" class="err">Please enter your last name.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium mb-1">Email Address</label>
+              <input id="email1" type="email" class="w-full border rounded-lg p-3" placeholder="example@example.com" required>
+              <p class="help">example@example.com</p>
+              <p id="err_email1" class="err">Enter a valid email address.</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Contact Number</label>
+              <input id="phone1" type="tel" class="w-full border rounded-lg p-3" placeholder="(000) 000-0000" required>
+              <p class="help">Please enter a valid phone number.</p>
+              <p id="err_phone1" class="err">Enter a valid phone number.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium mb-1">Password</label>
+              <input id="password1" type="password" class="w-full border rounded-lg p-3" placeholder="Enter password" required>
+              <p class="help">Minimum 6 characters.</p>
+              <p id="err_password1" class="err">Password must be at least 6 characters.</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Confirm Password</label>
+              <input id="confirm1" type="password" class="w-full border rounded-lg p-3" placeholder="Re-enter password" required>
+              <p id="err_confirm1" class="err">Passwords do not match.</p>
+            </div>
+          </div>
+
+          <div class="pt-4 text-right">
+            <button id="submitBtn" type="button" class="px-6 py-3 rounded-xl bg-purple-900 text-white font-semibold hover:bg-purple-950 transition duration-300">
+              Submit
+            </button>
+          </div>
+        </form>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    // Fill dynamic date
+    const d = new Date(); d.setMonth(d.getMonth()+1); document.getElementById('lastDay').textContent = d.toLocaleDateString();
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Single-step flow
+
+    function isEmail(v){ return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/.test(v); }
+    function isPhone(v){ return /[0-9]{3,}/.test(v.replace(/[^0-9]/g,'')); }
+    function setErr(inputId, errId, cond){
+      const el = document.getElementById(inputId); const msg = document.getElementById(errId);
+      if (cond){ el.classList.add('invalid'); if(msg) msg.style.display='block'; }
+      else { el.classList.remove('invalid'); if(msg) msg.style.display='none'; }
+      return !cond;
+    }
+    function validateStep1(){
+      const firstOk = setErr('firstName','err_firstName', document.getElementById('firstName').value.trim().length===0);
+      const lastOk  = setErr('lastName','err_lastName', document.getElementById('lastName').value.trim().length===0);
+      const emailOk = setErr('email1','err_email1', !isEmail(document.getElementById('email1').value.trim()));
+      const phoneOk = setErr('phone1','err_phone1', !isPhone(document.getElementById('phone1').value.trim()));
+      const passVal = document.getElementById('password1').value;
+      const confVal = document.getElementById('confirm1').value;
+      const passOk = setErr('password1','err_password1', passVal.length < 6);
+      const confOk = setErr('confirm1','err_confirm1', confVal !== passVal || confVal.length===0);
+      return firstOk && lastOk && emailOk && phoneOk && passOk && confOk;
+    }
+    // no step 2
+
+    submitBtn.addEventListener('click', ()=>{
+      if (!validateStep1()) return;
+      alert('Thank you for registering in InSightify');
+      window.location.href = 'index.html';
+    });
+
+  </script>
+</body>
+</html>

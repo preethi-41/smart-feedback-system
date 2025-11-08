@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Event Feedback | InSightify</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="preconnect" href="https://unpkg.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>💬</text></svg>">
+  <script>
+    try { if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())); } catch {}
+  </script>
+  <style>
+    body { overscroll-behavior: none; }
+    .background-blur { position: fixed; inset: 0; background: url('https://as2.ftcdn.net/v2/jpg/01/93/90/86/1000_F_193908646_lKQHdkI1eM9fnZPX8Yy67H7aRZQhQb8S.jpg') no-repeat center top; background-size: 125%; background-position: center 10%; filter: blur(5px) brightness(1); opacity: .8; transform: scale(1.03); z-index: 0; pointer-events: none; }
+    .pastel-dark-blue { color: #2B3A67; }
+    .logo-arcade { font-family: 'Press Start 2P', system-ui, sans-serif; color: #1e1b4b; letter-spacing: .5px; }
+  </style>
+  <link href="/dist/output.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-indigo-100 to-blue-200 min-h-screen">
+  <div class="background-blur"></div>
+  <header class="relative z-10 bg-white/80 backdrop-blur border-b-4 border-gray-300">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="h-20 flex items-center">
+        <div class="flex items-center gap-2 w-2/5">
+          <a href="index.html" class="flex items-center gap-2">
+            <span class="text-2xl md:text-3xl font-bold logo-arcade">InSightify</span>
+          </a>
+        </div>
+        <nav class="flex items-center justify-end gap-6 text-sm font-medium w-3/5">
+          <a href="index.html" class="text-gray-700 hover:text-indigo-700">Home</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <div style="position:relative; z-index:1; min-height:calc(100vh - 4rem); display:flex; align-items:center; justify-content:center; padding: 2rem;">
+    <div>
+      <div class="bg-white/80 backdrop-blur-xl p-10 rounded-3xl shadow-2xl text-center w-96 mx-auto">
+        <h1 class="text-3xl font-bold pastel-dark-blue mb-2">Event Feedback</h1>
+        <p class="text-gray-600 mb-6">Tell us who you are to continue</p>
+        <select id="roleSelect" class="p-3 w-full rounded-lg border border-gray-300 mb-4">
+          <option value="guest">Guest</option>
+          <option value="registered">Registered User</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button id="continueBtn" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/main.js"></script>
+</body>
+</html>
