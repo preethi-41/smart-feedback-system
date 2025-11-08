@@ -1,0 +1,49 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "start-backend",
+      "type": "shell",
+      "command": "npm run start:backend",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": false },
+      "problemMatcher": {
+        "owner": "custom-backend",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": { "regexp": ".*" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "API running on http://localhost:5000"
+        }
+      }
+    },
+    {
+      "label": "start-frontend",
+      "type": "shell",
+      "command": "npx http-server frontend -p 5500",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": false },
+      "problemMatcher": {
+        "owner": "custom-frontend",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": { "regexp": ".*" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "Available on:"
+        }
+      }
+    },
+    {
+      "label": "start-web",
+      "dependsOn": ["start-backend", "start-frontend"],
+      "dependsOrder": "parallel",
+      "type": "shell",
+      "command": "echo Servers started",
+      "problemMatcher": []
+    }
+  ]
+}
